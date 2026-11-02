@@ -1,0 +1,13 @@
+services:
+  ssl-scanner:
+    build: .
+    image: ssl-expiry-checker:latest
+    ports:
+      - "8000:8000"
+    environment:
+      RATE_LIMIT_PER_HOUR: "20"   # scans allowed per visitor per hour
+      MAX_RUNNING_SCANS: "3"      # scans running at the same time
+      MAX_HOSTS: "500"            # hostnames checked per scan
+      LOOKBACK_DAYS: "90"         # also check certificates that expired this recently
+      # TRUST_PROXY: "1"          # set when running behind nginx/Traefik so visitor IPs are read correctly
+    restart: unless-stopped

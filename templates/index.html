@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSL Expiry Scanner</title>
+  <meta name="description" content="Find every subdomain certificate of a website and see which ones expire first.">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <span class="brand">SSL Expiry Scanner</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <h1>See which certificates expire first</h1>
+      <p class="lede">Enter a website. We look up its subdomains in public certificate logs, check each live certificate, and rank them by expiry date.</p>
+
+      <form id="scan-form" novalidate>
+        <label for="domain" class="sr-only">Website address</label>
+        <div class="field">
+          <input id="domain" name="domain" type="text" inputmode="url" autocomplete="off" autocapitalize="off"
+                 spellcheck="false" placeholder="example.com" aria-describedby="form-error" required>
+          <button id="scan-btn" type="submit">Scan certificates</button>
+        </div>
+        <label class="check">
+          <input type="checkbox" id="deep">
+          <span>Also try common subdomain names such as mail, api and vpn (slower)</span>
+        </label>
+        <p id="form-error" class="form-error" role="alert"></p>
+      </form>
+    </section>
+
+    <section id="progress" class="progress" hidden aria-live="polite">
+      <div class="bar" role="progressbar" aria-label="Scan progress" aria-valuemin="0" aria-valuemax="100">
+        <span id="bar-fill"></span>
+      </div>
+      <p id="progress-text"></p>
+    </section>
+
+    <div id="warnings" class="warnings" hidden></div>
+
+    <section id="results" class="results" hidden>
+      <div class="results-head">
+        <div>
+          <h2 id="results-title"></h2>
+          <p id="results-sub" class="muted"></p>
+        </div>
+        <div class="exports">
+          <a id="dl-xlsx" class="btn" aria-disabled="true">Download Excel</a>
+          <a id="dl-pdf" class="btn" aria-disabled="true">Download PDF</a>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div id="chips" class="chips" role="group" aria-label="Filter by status"></div>
+        <label class="sr-only" for="search">Search hostnames</label>
+        <input id="search" type="search" placeholder="Search hostnames" autocomplete="off">
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" data-key="host" aria-sort="none"><button type="button">Hostname</button></th>
+              <th scope="col" data-key="status" aria-sort="none"><button type="button">Status</button></th>
+              <th scope="col" data-key="expires_at" aria-sort="ascending"><button type="button">Expires on</button></th>
+              <th scope="col" data-key="days_left" aria-sort="none"><button type="button">Time left</button></th>
+              <th scope="col" data-key="issuer" aria-sort="none"><button type="button">Issuer</button></th>
+              <th scope="col" data-key="ip" aria-sort="none"><button type="button">IP address</button></th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <p id="empty" class="empty" hidden>No hostnames match this filter.</p>
+      </div>
+      <p class="muted small">Subdomains come from public certificate logs, so hosts that never received a public certificate may be missing. Only port 443 is checked.</p>
+    </section>
+  </main>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
